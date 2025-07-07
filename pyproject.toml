@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "taxy"
+version = "0.1.0"
+description = "A GUI application for comparing investment strategies with different tax implications"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+    "tkinter",
+    "matplotlib>=3.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/etfrida/taxy"
+"Bug Tracker" = "https://github.com/etfrida/taxy/issues"
+
+[project.scripts]
+taxy = "taxy.main_gui:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["taxy*"]
+exclude = ["tests*"]
