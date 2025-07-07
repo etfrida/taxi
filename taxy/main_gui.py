@@ -3,7 +3,7 @@ from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from .multiplier_slider import MultiplierSlider
-from .plot_calculator import update_plot
+from .plot_calculator import update_plot, InvestmentParams
 
 
 def create_gui():
@@ -25,15 +25,24 @@ def create_gui():
     yield_value = tk.DoubleVar()
 
     def update_plot_wrapper(*args):
-        update_plot(ax, canvas, yield_value, initial_sum_entry, yield_label, tax_exempt_entry, expected_tax_rate_entry, *args)
+        initial_sum = float(initial_sum_entry.get())
+        yield_rate = float(yield_value.get()) / 100.0
+        tax_exempt = float(tax_exempt_entry.get())
+        expected_tax_rate = float(expected_tax_rate_entry.get()) / 100.0
+        handling_fee = float(handling_fee_entry.get()) / 100.0
+        inflation_rate = float(inflation_rate_entry.get()) / 100.0
 
-    def on_button_click():
-        print("Button clicked!")
-        multiplier_slider.reset()
-        update_plot_wrapper()
+        
+        params = InvestmentParams(
+            initial_sum=initial_sum,
+            yield_rate=yield_rate,
+            tax_exempt=tax_exempt,
+            expected_tax_rate=expected_tax_rate,
+            handling_fee=handling_fee,
+            inflation_rate=inflation_rate
+        )
+        update_plot(ax, canvas, params, yield_label)
 
-    action_button = ttk.Button(controls_frame, text="Reset Plot", command=on_button_click)
-    action_button.pack(pady=10)
 
     initial_sum_label = ttk.Label(controls_frame, text="Initial Sum:")
     initial_sum_label.pack(pady=5)
@@ -62,7 +71,7 @@ def create_gui():
     tax_exempt_label.pack(pady=5)
     
     tax_exempt_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
-    pack_and_bind(tax_exempt_entry, "500.0")
+    pack_and_bind(tax_exempt_entry, "450.0")
 
     expected_tax_rate_label = ttk.Label(controls_frame, text="Expected Tax Rate (%):")
     expected_tax_rate_label.pack(pady=5)
@@ -80,6 +89,18 @@ def create_gui():
     pcmd = (root.register(_validate_percentage), '%P')
     expected_tax_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
     pack_and_bind(expected_tax_rate_entry, "48.0")
+
+    handling_fee_label = ttk.Label(controls_frame, text="Handling fee (Provident fund) (%):")
+    handling_fee_label.pack(pady=5)
+    
+    handling_fee_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
+    pack_and_bind(handling_fee_entry, "0.5")
+
+    inflation_rate_label = ttk.Label(controls_frame, text="Inflation rate (%):")
+    inflation_rate_label.pack(pady=5)
+    
+    inflation_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
+    pack_and_bind(inflation_rate_entry, "1.5")
 
     plot_frame = ttk.LabelFrame(main_frame, text="Plot", padding="10")
     plot_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
