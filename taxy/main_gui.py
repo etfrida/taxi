@@ -6,6 +6,7 @@ from .multiplier_slider import MultiplierSlider
 from .plot_calculator import update_plot, InvestmentParams
 
 
+# Default values for GUI inputs
 DEF_INITIAL_SUM = "1000.0"
 DEF_YIELD_PRECENT = "9.0"
 DEF_TAX_EXEMPT = "450.0"
@@ -15,6 +16,8 @@ DEF_INFLATION_RATE = "1.5"
 
 
 def create_gui():
+    """Create and run the main GUI application."""
+    # Main window setup
     root = tk.Tk()
     root.title("Dynamic Plot App")
     root.geometry("800x600")
@@ -26,6 +29,7 @@ def create_gui():
     main_frame.grid_columnconfigure(1, weight=3)
     main_frame.grid_rowconfigure(0, weight=1)
 
+    # Controls panel setup
     controls_frame = ttk.LabelFrame(main_frame, text="Controls", padding="10")
     controls_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
     controls_frame.grid_rowconfigure(0, weight=1)
@@ -33,6 +37,7 @@ def create_gui():
     yield_value = tk.DoubleVar()
 
     def update_plot_wrapper(*args):
+        """Wrapper function to gather parameters and update plot."""
         initial_sum = float(initial_sum_entry.get())
         yield_rate = float(yield_value.get()) / 100.0
         tax_exempt = float(tax_exempt_entry.get())
@@ -40,7 +45,6 @@ def create_gui():
         handling_fee = float(handling_fee_entry.get()) / 100.0
         inflation_rate = float(inflation_rate_entry.get()) / 100.0
 
-        
         params = InvestmentParams(
             initial_sum=initial_sum,
             yield_rate=yield_rate,
@@ -51,10 +55,7 @@ def create_gui():
         )
         update_plot(ax, canvas, params, yield_label)
 
-
-    initial_sum_label = ttk.Label(controls_frame, text="Initial Sum:")
-    initial_sum_label.pack(pady=5)
-
+    # Validation functions
     def _validate_numeric(new_value):
         """Allow only floating point numbers or an empty string."""
         if new_value == "":
@@ -64,26 +65,7 @@ def create_gui():
             return True
         except ValueError:
             return False
-        
-    def pack_and_bind(entry: ttk.Entry, def_value: str):
-        entry.insert(0, def_value)
-        entry.pack(pady=5, fill=tk.X)
-        entry.bind("<Return>", update_plot_wrapper)
-        entry.bind("<FocusOut>", update_plot_wrapper)
 
-    vcmd = (root.register(_validate_numeric), '%P')
-    initial_sum_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
-    pack_and_bind(initial_sum_entry, DEF_INITIAL_SUM)
-
-    tax_exempt_label = ttk.Label(controls_frame, text="Tax Exempt:")
-    tax_exempt_label.pack(pady=5)
-    
-    tax_exempt_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
-    pack_and_bind(tax_exempt_entry, DEF_TAX_EXEMPT)
-
-    expected_tax_rate_label = ttk.Label(controls_frame, text="Expected Tax Rate (%):")
-    expected_tax_rate_label.pack(pady=5)
-    
     def _validate_percentage(new_value):
         """Allow only percentage values between 0 and 100 or an empty string."""
         if new_value == "":
@@ -93,23 +75,82 @@ def create_gui():
             return 0 <= value <= 100
         except ValueError:
             return False
-    
+
+    def pack_and_bind(entry: ttk.Entry, def_value: str):
+        """Pack entry widget and bind update events."""
+        entry.insert(0, def_value)
+        entry.pack(pady=5, fill=tk.X)
+        entry.bind("<Return>", update_plot_wrapper)
+        entry.bind("<FocusOut>", update_plot_wrapper)
+
+    # Validation commands
+    vcmd = (root.register(_validate_numeric), '%P')
     pcmd = (root.register(_validate_percentage), '%P')
+
+    # Initial Sum input
+    initial_sum_label = ttk.Label(controls_frame, text="Initial Sum:")
+    initial_sum_label.pack(pady=5)
+    initial_sum_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
+    pack_and_bind(initial_sum_entry, DEF_INITIAL_SUM)
+
+    # Tax Exempt input
+    tax_exempt_label = ttk.Label(controls_frame, text="Tax Exempt:")
+    tax_exempt_label.pack(pady=5)
+    tax_exempt_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
+    pack_and_bind(tax_exempt_entry, DEF_TAX_EXEMPT)
+
+    # Expected Tax Rate input
+    expected_tax_rate_label = ttk.Label(controls_frame, text="Expected Tax Rate (%):")
+    expected_tax_rate_label.pack(pady=5)
     expected_tax_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
     pack_and_bind(expected_tax_rate_entry, DEF_EXPECTED_TAX_RATE)
 
+    # Handling Fee input
     handling_fee_label = ttk.Label(controls_frame, text="Handling fee (Provident fund) (%):")
     handling_fee_label.pack(pady=5)
-    
     handling_fee_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
     pack_and_bind(handling_fee_entry, DEF_HANDLING_FEE)
 
+    # Inflation Rate input
     inflation_rate_label = ttk.Label(controls_frame, text="Inflation rate (%):")
     inflation_rate_label.pack(pady=5)
-    
     inflation_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
     pack_and_bind(inflation_rate_entry, DEF_INFLATION_RATE)
 
+    # Yield display label
+    yield_label = ttk.Label(controls_frame)
+    yield_label.pack(pady=5)
+
+    # Yield slider
+    multiplier_slider = MultiplierSlider(controls_frame, yield_value, update_plot_wrapper)
+
+    # Reset function
+    def reset_all_parameters():
+        """Reset all parameters to default values."""
+        initial_sum_entry.delete(0, tk.END)
+        initial_sum_entry.insert(0, DEF_INITIAL_SUM)
+
+        tax_exempt_entry.delete(0, tk.END)
+        tax_exempt_entry.insert(0, DEF_TAX_EXEMPT)
+
+        expected_tax_rate_entry.delete(0, tk.END)
+        expected_tax_rate_entry.insert(0, DEF_EXPECTED_TAX_RATE)
+
+        handling_fee_entry.delete(0, tk.END)
+        handling_fee_entry.insert(0, DEF_HANDLING_FEE)
+
+        inflation_rate_entry.delete(0, tk.END)
+        inflation_rate_entry.insert(0, DEF_INFLATION_RATE)
+
+        multiplier_slider.reset()
+        update_plot_wrapper()
+        toolbar.home()
+
+    # Reset button
+    reset_button = ttk.Button(controls_frame, text="Reset All", command=reset_all_parameters)
+    reset_button.pack(pady=10, side=tk.BOTTOM)
+
+    # Plot area setup
     plot_frame = ttk.LabelFrame(main_frame, text="Plot", padding="10")
     plot_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 
@@ -120,47 +161,19 @@ def create_gui():
 
     canvas = FigureCanvasTkAgg(fig, master=plot_frame)
 
-    yield_label = ttk.Label(controls_frame)
-    yield_label.pack(pady=5)
-
-    multiplier_slider = MultiplierSlider(controls_frame, yield_value, update_plot_wrapper)
-
-    def reset_all_parameters():
-        # Reset all entry fields to default values
-        initial_sum_entry.delete(0, tk.END)
-        initial_sum_entry.insert(0, DEF_INITIAL_SUM)
-        
-        tax_exempt_entry.delete(0, tk.END)
-        tax_exempt_entry.insert(0, DEF_TAX_EXEMPT)
-        
-        expected_tax_rate_entry.delete(0, tk.END)
-        expected_tax_rate_entry.insert(0, DEF_EXPECTED_TAX_RATE)
-        
-        handling_fee_entry.delete(0, tk.END)
-        handling_fee_entry.insert(0, DEF_HANDLING_FEE)
-        
-        inflation_rate_entry.delete(0, tk.END)
-        inflation_rate_entry.insert(0, DEF_INFLATION_RATE)
-        
-        # Reset slider
-        multiplier_slider.reset()
-        
-        # Update plot and reset view
-        update_plot_wrapper()
-        toolbar.home()
-
-    reset_button = ttk.Button(controls_frame, text="Reset All", command=reset_all_parameters)
-    reset_button.pack(pady=10, side=tk.BOTTOM)
-
+    # Matplotlib toolbar
     toolbar = NavigationToolbar2Tk(canvas, plot_frame)
     toolbar.update()
     toolbar.pack(side=tk.TOP, fill=tk.X)
 
+    # Canvas widget
     canvas_widget = canvas.get_tk_widget()
     canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
+    # Initial plot update
     update_plot_wrapper()
 
+    # Window closing handler
     def _on_closing():
         plt.close(fig)
         root.destroy()
@@ -168,9 +181,11 @@ def create_gui():
     root.protocol("WM_DELETE_WINDOW", _on_closing)
     root.mainloop()
 
+
 def main():
     """Main entry point for the application."""
     create_gui()
+
 
 if __name__ == "__main__":
     main()
