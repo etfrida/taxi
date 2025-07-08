@@ -6,6 +6,14 @@ from .multiplier_slider import MultiplierSlider
 from .plot_calculator import update_plot, InvestmentParams
 
 
+DEF_INITIAL_SUM = "1000.0"
+DEF_YIELD_PRECENT = "9.0"
+DEF_TAX_EXEMPT = "450.0"
+DEF_EXPECTED_TAX_RATE = "48.0"
+DEF_HANDLING_FEE = "0.5"
+DEF_INFLATION_RATE = "1.5"
+
+
 def create_gui():
     root = tk.Tk()
     root.title("Dynamic Plot App")
@@ -65,13 +73,13 @@ def create_gui():
 
     vcmd = (root.register(_validate_numeric), '%P')
     initial_sum_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
-    pack_and_bind(initial_sum_entry, "1000.0")
+    pack_and_bind(initial_sum_entry, DEF_INITIAL_SUM)
 
     tax_exempt_label = ttk.Label(controls_frame, text="Tax Exempt:")
     tax_exempt_label.pack(pady=5)
     
     tax_exempt_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
-    pack_and_bind(tax_exempt_entry, "450.0")
+    pack_and_bind(tax_exempt_entry, DEF_TAX_EXEMPT)
 
     expected_tax_rate_label = ttk.Label(controls_frame, text="Expected Tax Rate (%):")
     expected_tax_rate_label.pack(pady=5)
@@ -88,19 +96,19 @@ def create_gui():
     
     pcmd = (root.register(_validate_percentage), '%P')
     expected_tax_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
-    pack_and_bind(expected_tax_rate_entry, "48.0")
+    pack_and_bind(expected_tax_rate_entry, DEF_EXPECTED_TAX_RATE)
 
     handling_fee_label = ttk.Label(controls_frame, text="Handling fee (Provident fund) (%):")
     handling_fee_label.pack(pady=5)
     
     handling_fee_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
-    pack_and_bind(handling_fee_entry, "0.5")
+    pack_and_bind(handling_fee_entry, DEF_HANDLING_FEE)
 
     inflation_rate_label = ttk.Label(controls_frame, text="Inflation rate (%):")
     inflation_rate_label.pack(pady=5)
     
     inflation_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
-    pack_and_bind(inflation_rate_entry, "1.5")
+    pack_and_bind(inflation_rate_entry, DEF_INFLATION_RATE)
 
     plot_frame = ttk.LabelFrame(main_frame, text="Plot", padding="10")
     plot_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
@@ -116,6 +124,33 @@ def create_gui():
     yield_label.pack(pady=5)
 
     multiplier_slider = MultiplierSlider(controls_frame, yield_value, update_plot_wrapper)
+
+    def reset_all_parameters():
+        # Reset all entry fields to default values
+        initial_sum_entry.delete(0, tk.END)
+        initial_sum_entry.insert(0, DEF_INITIAL_SUM)
+        
+        tax_exempt_entry.delete(0, tk.END)
+        tax_exempt_entry.insert(0, DEF_TAX_EXEMPT)
+        
+        expected_tax_rate_entry.delete(0, tk.END)
+        expected_tax_rate_entry.insert(0, DEF_EXPECTED_TAX_RATE)
+        
+        handling_fee_entry.delete(0, tk.END)
+        handling_fee_entry.insert(0, DEF_HANDLING_FEE)
+        
+        inflation_rate_entry.delete(0, tk.END)
+        inflation_rate_entry.insert(0, DEF_INFLATION_RATE)
+        
+        # Reset slider
+        multiplier_slider.reset()
+        
+        # Update plot and reset view
+        update_plot_wrapper()
+        toolbar.home()
+
+    reset_button = ttk.Button(controls_frame, text="Reset All", command=reset_all_parameters)
+    reset_button.pack(pady=10, side=tk.BOTTOM)
 
     toolbar = NavigationToolbar2Tk(canvas, plot_frame)
     toolbar.update()
