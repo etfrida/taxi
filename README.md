@@ -7,20 +7,22 @@ A GUI application for comparing different investment strategies with tax implica
 - **Interactive GUI** with sliders and input fields
 - **Real-time plotting** of investment growth over time
 - **Tax strategy comparison** between:
-  - Deferred tax strategy with 0.5% handling fees
-  - Immediate tax strategy with customizable tax-exempt amount
+  - Deferred tax strategy with customizable handling fees and inflation-adjusted tax-exempt amounts
+  - Immediate tax strategy with 25% gains tax rate
 - **Customizable parameters**:
   - Initial investment amount
-  - Tax-exempt amount
+  - Tax-exempt amount (inflation-adjusted over time)
   - Expected tax rate percentage
   - Yearly yield percentage (0-30%)
-  - Investment timeframe (35 years)
+  - Inflation rate percentage (adjusts tax-exempt amount annually)
+  - Handling fee percentage (customizable provident fund fees)
+  - Investment timeframe (30 years)
 
 ## Screenshots
 
 The application displays two investment strategies on the same plot:
-- Blue line: Deferred tax strategy with 0.5% annual handling fees
-- Red line: Immediate tax strategy with reduced initial investment (tax paid upfront)
+- Blue line: Deferred tax strategy with customizable handling fees and inflation-adjusted tax exemptions
+- Red line: Immediate tax strategy with 25% gains tax rate and reduced initial investment (tax paid upfront)
 
 ## Installation
 
@@ -52,11 +54,14 @@ taxy
 ## Usage
 
 1. **Set Initial Investment**: Enter your initial investment amount (default: 1000)
-2. **Configure Tax-Exempt Amount**: Enter the portion of investment that's tax-exempt (default: 500)
+2. **Configure Tax-Exempt Amount**: Enter the portion of investment that's tax-exempt (default: 450)
 3. **Set Expected Tax Rate**: Enter your expected tax rate as a percentage (default: 48%)
-4. **Adjust Yield Rate**: Use the slider to set yearly yield percentage (0-30%, default: 9%)
-5. **Compare Strategies**: View both investment strategies plotted on the same graph
-6. **Reset**: Click "Reset Plot" to return to default values
+4. **Set Inflation Rate**: Enter the annual inflation rate that adjusts tax-exempt amount (default: 1.5%)
+5. **Configure Handling Fee**: Set the provident fund handling fee percentage (default: 0.5%)
+6. **Adjust Yield Rate**: Use the slider to set yearly yield percentage (0-30%, default: 9%)
+7. **Compare Strategies**: View both investment strategies plotted on the same graph over 30 years
+8. **Navigate Plot**: Use the matplotlib toolbar to zoom, pan, and reset the plot view
+9. **Reset All**: Click "Reset All" to return all parameters to default values
 
 ## Requirements
 
