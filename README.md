@@ -23,6 +23,8 @@ A GUI application for comparing different investment strategies with tax implica
 The application displays two investment strategies on the same plot:
 - Blue line: Deferred tax strategy with customizable handling fees and inflation-adjusted tax exemptions
 - Red line: Immediate tax strategy with 25% gains tax rate and reduced initial investment (tax paid upfront)
+  
+**In both cases your "Networth" is the total money your left with, _after taxes_, given you're withdrawing the funds at year X.**
 
 ## Installation
 
