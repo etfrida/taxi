@@ -1,3 +1,4 @@
+from typing import NamedTuple, List
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -36,25 +37,6 @@ def create_gui():
 
     yield_value = tk.DoubleVar()
 
-    def update_plot_wrapper(*args):
-        """Wrapper function to gather parameters and update plot."""
-        initial_sum = float(initial_sum_entry.get())
-        yield_rate = float(yield_value.get()) / 100.0
-        tax_exempt = float(tax_exempt_entry.get())
-        expected_tax_rate = float(expected_tax_rate_entry.get()) / 100.0
-        handling_fee = float(handling_fee_entry.get()) / 100.0
-        inflation_rate = float(inflation_rate_entry.get()) / 100.0
-
-        params = InvestmentParams(
-            initial_sum=initial_sum,
-            yield_rate=yield_rate,
-            tax_exempt=tax_exempt,
-            expected_tax_rate=expected_tax_rate,
-            handling_fee=handling_fee,
-            inflation_rate=inflation_rate
-        )
-        update_plot(ax, canvas, params, yield_label)
-
     # Validation functions
     def _validate_numeric(new_value):
         """Allow only floating point numbers or an empty string."""
@@ -76,53 +58,45 @@ def create_gui():
         except ValueError:
             return False
 
-    def pack_and_bind(entry: ttk.Entry, def_value: str):
-        """Pack entry widget and bind update events."""
-        entry.insert(0, def_value)
-        entry.pack(pady=5, fill=tk.X)
-        entry.bind("<Return>", update_plot_wrapper)
-        entry.bind("<FocusOut>", update_plot_wrapper)
-
     # Validation commands
     vcmd = (root.register(_validate_numeric), '%P')
     pcmd = (root.register(_validate_percentage), '%P')
 
     # Initial Sum input
     initial_sum_label = ttk.Label(controls_frame, text="Initial Sum:")
-    initial_sum_label.pack(pady=5)
     initial_sum_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
-    pack_and_bind(initial_sum_entry, DEF_INITIAL_SUM)
 
     # Tax Exempt input
     tax_exempt_label = ttk.Label(controls_frame, text="Tax Exempt:")
-    tax_exempt_label.pack(pady=5)
     tax_exempt_entry = ttk.Entry(controls_frame, validate='key', validatecommand=vcmd)
-    pack_and_bind(tax_exempt_entry, DEF_TAX_EXEMPT)
 
     # Expected Tax Rate input
     expected_tax_rate_label = ttk.Label(controls_frame, text="Expected Tax Rate (%):")
-    expected_tax_rate_label.pack(pady=5)
     expected_tax_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
-    pack_and_bind(expected_tax_rate_entry, DEF_EXPECTED_TAX_RATE)
 
     # Handling Fee input
     handling_fee_label = ttk.Label(controls_frame, text="Handling fee (Provident fund) (%):")
-    handling_fee_label.pack(pady=5)
     handling_fee_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
-    pack_and_bind(handling_fee_entry, DEF_HANDLING_FEE)
 
     # Inflation Rate input
     inflation_rate_label = ttk.Label(controls_frame, text="Inflation rate (%):")
-    inflation_rate_label.pack(pady=5)
     inflation_rate_entry = ttk.Entry(controls_frame, validate='key', validatecommand=pcmd)
-    pack_and_bind(inflation_rate_entry, DEF_INFLATION_RATE)
 
-    # Yield display label
-    yield_label = ttk.Label(controls_frame)
-    yield_label.pack(pady=5)
+    class LabelEntryTuple(NamedTuple):
+        label: ttk.Label
+        entry: ttk.Entry
+        def_value: str
 
-    # Yield slider
-    multiplier_slider = MultiplierSlider(controls_frame, yield_value, update_plot_wrapper)
+    label_entry_tuples: List[LabelEntryTuple] = [
+        LabelEntryTuple(initial_sum_label, initial_sum_entry, DEF_INITIAL_SUM),
+        LabelEntryTuple(tax_exempt_label, tax_exempt_entry, DEF_TAX_EXEMPT  ),
+        LabelEntryTuple(expected_tax_rate_label, expected_tax_rate_entry, DEF_EXPECTED_TAX_RATE),
+        LabelEntryTuple(handling_fee_label, handling_fee_entry, DEF_HANDLING_FEE),
+        LabelEntryTuple(inflation_rate_label, inflation_rate_entry, DEF_INFLATION_RATE)
+    ]
+
+    # Yield slider (will be initialized after update_plot_wrapper is defined)
+    multiplier_slider = None
 
     # Reset function
     def reset_all_parameters():
@@ -160,6 +134,44 @@ def create_gui():
     ax.set_ylabel("Networth")
 
     canvas = FigureCanvasTkAgg(fig, master=plot_frame)
+
+    # Define update plot wrapper function after ax and canvas are created
+    def update_plot_wrapper(*args):
+        """Wrapper function to gather parameters and update plot."""
+        initial_sum = float(initial_sum_entry.get())
+        yield_rate = float(yield_value.get()) / 100.0
+        tax_exempt = float(tax_exempt_entry.get())
+        expected_tax_rate = float(expected_tax_rate_entry.get()) / 100.0
+        handling_fee = float(handling_fee_entry.get()) / 100.0
+        inflation_rate = float(inflation_rate_entry.get()) / 100.0
+
+        params = InvestmentParams(
+            initial_sum=initial_sum,
+            yield_rate=yield_rate,
+            tax_exempt=tax_exempt,
+            expected_tax_rate=expected_tax_rate,
+            handling_fee=handling_fee,
+            inflation_rate=inflation_rate
+        )
+        update_plot(ax, canvas, params, yield_label)
+
+    # Pack and bind parameter entries
+    def pack_and_bind(label: ttk.Label, entry: ttk.Entry, def_value: str):
+        """Pack entry widget and bind update events."""
+        label.pack(pady=5)
+        entry.insert(0, def_value)
+        entry.pack(pady=5, fill=tk.X)
+        entry.bind("<Return>", update_plot_wrapper)
+        entry.bind("<FocusOut>", update_plot_wrapper)
+
+    for label_entry_tuple in label_entry_tuples:
+        pack_and_bind(label_entry_tuple.label, label_entry_tuple.entry, label_entry_tuple.def_value)
+
+    # Yield display label
+    yield_label = ttk.Label(controls_frame)
+    yield_label.pack(pady=5)
+    # Initialize the multiplier slider now that update_plot_wrapper is defined
+    multiplier_slider = MultiplierSlider(controls_frame, yield_value, update_plot_wrapper)
 
     # Matplotlib toolbar
     toolbar = NavigationToolbar2Tk(canvas, plot_frame)
