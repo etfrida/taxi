@@ -10,7 +10,7 @@ from .plot_calculator import update_plot, InvestmentParams
 # Default values for GUI inputs
 DEF_INITIAL_SUM = "1000.0"
 DEF_YIELD_PRECENT = "9.0"
-DEF_TAX_EXEMPT = "450.0"
+DEF_TAX_EXEMPT = "400.0"
 DEF_EXPECTED_TAX_RATE = "48.0"
 DEF_HANDLING_FEE = "0.5"
 DEF_INFLATION_RATE = "1.5"

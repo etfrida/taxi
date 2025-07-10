@@ -27,11 +27,11 @@ def update_plot(ax, canvas, params: InvestmentParams, yield_label):
     for year in range(NUM_YEARS):
         gross_value = params.initial_sum * (net_yield_with_fees ** year)
         adjusted_tax_exempt = params.tax_exempt * ((1.0 + params.inflation_rate) ** year)
-        tax = gross_value * params.expected_tax_rate - adjusted_tax_exempt
+        tax = (gross_value - adjusted_tax_exempt) * params.expected_tax_rate
         deferred_tax_values[year] = gross_value - tax
     
     # ------- Immediate tax method -------
-    straight_up_tax = (params.initial_sum * params.expected_tax_rate) - params.tax_exempt
+    straight_up_tax = (params.initial_sum - params.tax_exempt) * params.expected_tax_rate
     reduced_initial_sum = params.initial_sum - straight_up_tax
     
     immediate_tax_values = list(range(NUM_YEARS))
