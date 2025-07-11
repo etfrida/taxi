@@ -1,13 +1,14 @@
 """
 Taxy - Investment Strategy Comparison Tool
 
-A GUI application for comparing investment strategies with different tax implications.
+A web application for comparing investment strategies with different tax implications.
+Built with Streamlit and Plotly for interactive visualizations.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "Your Name"
 __email__ = "your.email@example.com"
 
-from .main_gui import create_gui
+from .plot_calculator import create_plotly_figure, InvestmentParams
 
-__all__ = ["create_gui"]
+__all__ = ["create_plotly_figure", "InvestmentParams"]
